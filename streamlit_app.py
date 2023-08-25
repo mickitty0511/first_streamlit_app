@@ -52,7 +52,6 @@ try:
 except URLError as e:
      st.error()
 
-# st.stop() # code to stop the following processes in order to troubleshoot
 
 st.header("View Our Fruit List -Add Your Favorites")
 
@@ -77,7 +76,7 @@ def insert_row_snowflake(new_fruit):
           return "Thanks for adding " + new_fruit
           
 add_my_fruit = st.text_input(
-     'What fruit would you like to add'
+     'What fruit would you like to add?'
      , placeholder = 'Input One of your fruit!'
 )
 
@@ -86,3 +85,5 @@ if st.button('Add a Fruit to the List'):
      back_from_function = insert_row_snowflake(add_my_fruit)
      # my_cnx.close()
      st.text(back_from_function)
+     
+# st.stop() # code to stop the following processes in order to troubleshoot
