@@ -65,7 +65,8 @@ def get_fruit_load_list():
 # Add a button to load the fruit
 if st.button('Get Fruit List'):
      my_cnx = sf.connect(**st.secrets["snowflake"]) # load client secret
-     my_data_rows = get_fruit_load_list 
+     my_data_rows = get_fruit_load_list()
+     my_data_rows
      # my_cnx.close()
      st.dataframe(my_data_rows) # display a table of the result
 
