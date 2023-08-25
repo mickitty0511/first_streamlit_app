@@ -69,7 +69,7 @@ if st.button('Get Fruit List'):
      my_cnx.close()
      st.dataframe(
           my_data_rows
-          , hide_index = False
+          , hide_index = False # to show Dataframe-based index, set hide_index to False 
      ) # display a table of the result
 
 # Allow the end user to add a fruit to the list and show a result text
