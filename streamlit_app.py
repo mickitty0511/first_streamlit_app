@@ -1,4 +1,8 @@
 import streamlit as st
+import pandas as pd
+import requests as req
+import snowflake.connector as sf
+from urllib.error import URLError
 
 st.title('My Parents New Healthy Diner')
 
@@ -10,7 +14,6 @@ st.text('🥑🍞 Avocado Toast')
 
 st.header('🍌🥭 Build Your Own Fruit Smoothie 🥝🍇')
 
-import pandas as pd
 
 my_fruit_list = pd.read_csv("https://uni-lab-files.s3.us-west-2.amazonaws.com/dabw/fruit_macros.txt")
 my_fruit_list = my_fruit_list.set_index('Fruit')
@@ -28,36 +31,56 @@ st.dataframe(fruits_to_show)
 
 # New Section to display fruityvice api response
 st.header("Fruityvice Fruit Advice!")
-fruit_choice = st.text_input(
-     'What fruit would you like information about?'
-     , 'Kiwi'
-)
-st.write(
-     'The user entered'
-     , fruit_choice
-) # display a text on screen
 
-import requests as req
-fruityvice_response = req.get("https://fruityvice.com/api/fruit/watermelon")
-# st.text(fruityvice_response.json()) # just writes the data to the screen
+# create the repeatable code block(called a function)
+# show a row from the target table and filter by a user's input through REST API
+def get_fruityvice_data(this_fruit_choice):
+     fruityvice_response = req.get("https://fruityvice.com/api/fruit/" + this_fruit_choice)
+     fruityvice_normalized = pd.json_normalize(fruityvice_response.json())
+     return fruityvice_normalized
 
-# write your own comment -what does the next line do? 
-fruityvice_normalized = pd.json_normalize(fruityvice_response.json())
+try:
+     fruit_choice = st.text_input('What fruit would you like information about?')
 
-# write your own comment - what does this do?
-st.dataframe(fruityvice_normalized)
+     if not fruit_choice:
+          st.error("Please select a fruit to get information.")
+     else:
+          back_from_function = get_fruityvice_data(fruit_choice)
+          st.dataframe(back_from_function)
+          
 
-import snowflake.connector as sf
-my_cnx = sf.connect(**st.secrets["snowflake"])
-my_cur = my_cnx.cursor()
-my_cur.execute("select * from fruit_load_list")
-my_data_rows = my_cur.fetchall()
+except URLError as e:
+     st.error()
+
+# st.stop() # code to stop the following processes in order to troubleshoot
+
 st.header("The fruit load list contains:")
-st.dataframe(my_data_rows)
 
-fruit_ingest = st.text_input(
+# Snowflake-related functions
+# get all data from a target table
+def get_fruit_load_list():
+     with my_cnx.cursor() as my_cur:
+          my_cur.execute("select * from fruit_load_list") # perform a SQL against the target table
+          return my_cur.fetchall() # get all rows from the result
+
+# Add a button to load the fruit
+if st.button('Get Fruit Load List'):
+     my_cnx = sf.connect(**st.secrets["snowflake"]) # load client secret
+     my_data_rows = get_fruit_load_list 
+     st.dataframe(my_data_rows) # display a table of the result
+
+# Allow the end user to add a fruit to the list and show a result text
+def insert_row_snowflake(new_fruit):
+     with my_cnx.cursor() as my_cur:
+          my_cur.execute("insert into fruit_load_list values ()")
+          return "Thanks for adding " + new_fruit
+          
+add_my_fruit = st.text_input(
      'What fruit would you like to add'
      , placeholder = 'Input One of your fruit!'
 )
 
-st.write('Thanks for adding ', fruit_ingest)
+if st.button('Add a Fruit to the List'):
+     my_cnx = sf.connect(**st.secrets["snowflake"]) # load client secret
+     back_from_function = insert_row_snowflake(add_my_fruit)
+     st.text(back_from_function)
