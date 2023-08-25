@@ -32,7 +32,10 @@ fruit_choice = st.text_input(
      'What fruit would you like information about?'
      , 'Kiwi'
 )
-st.write('The user entered', fruit_choice) # display a text on screen
+st.write(
+     'The user entered'
+     , fruit_choice
+) # display a text on screen
 
 import requests as req
 fruityvice_response = req.get("https://fruityvice.com/api/fruit/watermelon")
@@ -51,3 +54,10 @@ my_cur.execute("select * from fruit_load_list")
 my_data_rows = my_cur.fetchall()
 st.header("The fruit load list contains:")
 st.dataframe(my_data_rows)
+
+fruit_ingest = st.text_input(
+     'What fruit would you like to add'
+     , placeholder = 'Input One of your fruit!'
+)
+
+st.write('Thanks for adding ', fruit_ingest)
