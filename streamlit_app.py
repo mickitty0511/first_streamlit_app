@@ -67,7 +67,10 @@ if st.button('Get Fruit List'):
      my_cnx = sf.connect(**st.secrets["snowflake"]) # load client secret
      my_data_rows = get_fruit_load_list()
      my_cnx.close()
-     st.dataframe(my_data_rows) # display a table of the result
+     st.dataframe(
+          my_data_rows
+          , hide_index = False
+     ) # display a table of the result
 
 # Allow the end user to add a fruit to the list and show a result text
 def insert_row_snowflake(new_fruit):
