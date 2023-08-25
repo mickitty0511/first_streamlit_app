@@ -4,7 +4,7 @@ import requests as req
 import snowflake.connector as sf
 from urllib.error import URLError
 
-st.title('View Our Fruit List -Add Your Favorites')
+st.title('My Mom\'s New Healthy Diner')
 
 st.header('Breakfast Favorites')
 st.text('🥣 Omega 3 & Blueberry Oatmeal')
@@ -54,7 +54,7 @@ except URLError as e:
 
 # st.stop() # code to stop the following processes in order to troubleshoot
 
-st.header("The fruit load list contains:")
+st.header("View Our Fruit List -Add Your Favorites")
 
 # Snowflake-related functions
 # get all data from a target table
@@ -84,4 +84,5 @@ add_my_fruit = st.text_input(
 if st.button('Add a Fruit to the List'):
      my_cnx = sf.connect(**st.secrets["snowflake"]) # load client secret
      back_from_function = insert_row_snowflake(add_my_fruit)
+     my_cnx.close()
      st.text(back_from_function)
